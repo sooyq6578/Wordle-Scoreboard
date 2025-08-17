@@ -129,9 +129,7 @@ async def on_message(message):
     message_author = message.author
     message_channel = message.channel
 
-    print("Msg: " + message_content.encode('ascii', errors='ignore').decode('ascii'))
-
-    if str(message_author) == "Wordle#2092" or str(message_author) == "beibureido6578#0":
+    if str(message_author) == "Wordle#2092" or str(message_author) == "Wordle#0" or str(message_author) == "Wordle":
         scores = await parse_message(message_content)
         if not scores:
             return
@@ -160,7 +158,6 @@ async def set(ctx, message):
         date = str(ctx.message.created_at.astimezone(ZoneInfo("Asia/Kuala_Lumpur")).date())
 
         # check if updated for today
-        print(data, date)
         try:
             if data["updated"][user_id] != date:
                 # manually update score
