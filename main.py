@@ -190,6 +190,14 @@ async def print_tries(ctx):
     today_date = str(ctx.message.created_at.astimezone(ZoneInfo("Asia/Kuala_Lumpur")).date())
     await ctx.channel.send(await print_scores(data, "tries", today_date))
 
+@bot.command(name="help")
+async def help(ctx):
+    await ctx.channel.send(">>> __**Commands available:**__\n"\
+                           "**$set** ***channel***: Sets your score for today. Note that after you set for today, your Discord Wordle attempt will not be counted.\n"\
+                           "**$scoreboard**: Displays the overall scoreboard.\n"\
+                           "**$score**: Displays the score for today and yesterday.\n"\
+                           "**$tries**: Displays each users' tries for today and yesterday.")
+
 if __name__ == "__main__":
     # keep_alive()
     bot.run(os.environ['TOKEN'])
