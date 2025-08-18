@@ -10,7 +10,6 @@ from dotenv import load_dotenv, set_key
 
 intent = discord.Intents.all()
 bot = commands.Bot(command_prefix='&', help_command=None, intents=intent)
-client = discord.Client()
 guild = None
 chan = None
 chat_lounge = None
@@ -47,6 +46,10 @@ async def parse_message(msg):
             score = match.group(1)
             users = re.findall(r'\w+', match.group(2))
             for user in users:
+                try:
+                    _ = int(user)
+                except ValueError:
+                    user = guild.get_member_named(user).id
                 user_scores[user] = 7 if score == "X" else int(score)
 
     return user_scores
@@ -54,11 +57,7 @@ async def parse_message(msg):
 async def update_scoreboard(data, scores):
     for k in scores.keys():
         try:
-            # pass all manually updated
-            if data["updated"][k] != data["date"]:
-                data['scoreboard'][k] = data['scoreboard'][k] + scores[k]
-            else:
-                data['scoreboard'][k] = data['scoreboard'][k]
+            data['scoreboard'][k] = data['scoreboard'][k] + scores[k]
         except KeyError:
             data['scoreboard'][k] = scores[k]
 
@@ -154,6 +153,8 @@ async def set(ctx, message):
     global data
     try:
         tries = 7 if message == "X" else int(message)
+        if tries > 6 or tries < 1:
+            raise TypeError("Invalid input: " + message)
         user_id = str(ctx.author.id)
         date = str(ctx.message.created_at.astimezone(ZoneInfo("Asia/Kuala_Lumpur")).date())
 
@@ -170,6 +171,7 @@ async def set(ctx, message):
             data['scores'][user_id] = 7 - tries
             data["updated"][user_id] = date
 
+        print(data["scores"], data["updated"])
         await ctx.channel.send("Score updated for {}".format(ctx.author.mention))
     except Exception:
         await ctx.channel.send("Please enter a number between 1 to 6 for your number of tries, or X if failed.")
