@@ -196,7 +196,8 @@ async def help(ctx):
                            "**$set** ***channel***: Sets your score for today. Note that after you set for today, your Discord Wordle attempt will not be counted.\n"\
                            "**$scoreboard**: Displays the overall scoreboard.\n"\
                            "**$score**: Displays the score for today and yesterday.\n"\
-                           "**$tries**: Displays each users' tries for today and yesterday.")
+                           "**$tries**: Displays each users' tries for today and yesterday.\n\n"
+                           "6 points are awarded for a success with 1 attempt, each incorrect try will minus 1 point.")
 
 if __name__ == "__main__":
     # keep_alive()
