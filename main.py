@@ -109,17 +109,22 @@ async def print_scores(data, type, today_date):
 
 
 async def update_scores(data, scores):
-    # skip those already manually updated for today
     d = {}
-    for k, v in scores.items():
+    for k, v in data["scores"].items():
         try:
-            if data["scores"][k] and data["updated"][k] != data["date"]:
-                d[k] = 7 - v
+            if scores[k] and data["updated"][k] != data["date"]:
+                d[k] = 7 - scores[k]
             else:
                 d[k] = data["scores"][k]
         except KeyError:
-                d[k] = 7 - v
+                # handle manual update
+                if data["updated"][k] == data["date"]:
+                    d[k] = data["scores"][k]
     return d
+
+async def write_backup(data):
+    with open('backup_scores.json', 'w') as file:
+        json.dump(data, file, indent=4)
 
 @bot.event
 async def on_message(message):
@@ -134,6 +139,7 @@ async def on_message(message):
             return
         else:
             global data
+            await write_backup(data)
             message_date = message.created_at.astimezone(ZoneInfo("Asia/Kuala_Lumpur"))
             date = message_date - timedelta(days=1)
             data['date'] = str(date.date())
@@ -172,6 +178,9 @@ async def set(ctx, message):
             data["updated"][user_id] = date
 
         print(data["scores"], data["updated"])
+        # write to temp file
+        with open('temp_scores.json', 'w') as file:
+            json.dump(data, file, indent=4)
         await ctx.channel.send("Score updated for {}".format(ctx.author.mention))
     except Exception:
         await ctx.channel.send("Please enter a number between 1 to 6 for your number of tries, or X if failed.")
