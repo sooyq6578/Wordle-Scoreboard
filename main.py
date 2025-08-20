@@ -25,7 +25,7 @@ channel_id = os.environ["CHANNEL_ID"]
 async def on_ready():
     global guild, chan, chat_lounge
     print('We have logged in as {0.user}'.format(bot))
-    guild = bot.guilds[0]
+    guild = bot.guilds[1]
     chan = guild.get_channel(int(channel_id))
     chat_lounge = guild.get_channel(914110047859118080)
 
@@ -49,7 +49,7 @@ async def parse_message(msg):
                 try:
                     _ = int(user)
                 except ValueError:
-                    user = guild.get_member_named(user).id
+                    user = str(guild.get_member_named(user).id)
                 user_scores[user] = 7 if score == "X" else int(score)
 
     return user_scores
@@ -110,16 +110,27 @@ async def print_scores(data, type, today_date):
 
 async def update_scores(data, scores):
     d = {}
+    # iterate for manually added first
     for k, v in data["scores"].items():
+        print(k, v)
         try:
-            if scores[k] and data["updated"][k] != data["date"]:
-                d[k] = 7 - scores[k]
-            else:
+            # add if updated today
+            if data["updated"][k] == data["date"]:
                 d[k] = data["scores"][k]
+        # new user
         except KeyError:
-                # handle manual update
-                if data["updated"][k] == data["date"]:
-                    d[k] = data["scores"][k]
+            d[k] = data["scores"][k]
+
+    # next, iterate for auto added
+    for k, v in scores.items():
+        try:
+            if data["updated"][k] != data["date"]:
+                d[k] = 7 - scores[k]
+        # new user
+        except KeyError:
+            # add only if not yet manually updated
+            if k not in d:
+                d[k] = data["scores"][k]
     return d
 
 async def write_backup(data):
@@ -133,7 +144,7 @@ async def on_message(message):
     message_author = message.author
     message_channel = message.channel
 
-    if str(message_author) == "Wordle#2092" or str(message_author) == "Wordle#0" or str(message_author) == "Wordle":
+    if str(message_author) == "Wordle#2092" or str(message_author) == "Wordle#0" or str(message_author) == "Wordle" or str(message_author) == "beibureido6578#0":
         scores = await parse_message(message_content)
         if not scores:
             return
