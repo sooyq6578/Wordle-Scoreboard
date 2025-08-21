@@ -130,7 +130,7 @@ async def update_scores(data, scores):
         except KeyError:
             # add only if not yet manually updated
             if k not in d:
-                d[k] = data["scores"][k]
+                d[k] = 7 - scores[k]
     return d
 
 async def write_backup(data):
